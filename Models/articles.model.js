@@ -1,13 +1,15 @@
 const db = require("../db/connection");
 
-exports.selectTopics = () => {
+exports.selectArticleById = (id) => {
     return db
         .query(
             `
     SELECT *
-    FROM topics;`
+    FROM articles
+    WHERE article_id = $1`,
+            [id]
         )
         .then(({ rows }) => {
-            return rows;
+            return rows[0];
         });
 };

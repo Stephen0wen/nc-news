@@ -20,12 +20,12 @@ describe("/api", () => {
             .get("/api")
             .expect(200)
             .then(({ body }) => {
-                expect(body).toEqual(endpoints);
+                expect(body.endpoints).toEqual(endpoints);
             });
     });
 });
 
-describe("api/topics", () => {
+describe("/api/topics", () => {
     test("GET:200 Should send an array of topics to the client", () => {
         return request(app)
             .get("/api/topics")
@@ -37,6 +37,26 @@ describe("api/topics", () => {
                     expect(typeof topic.slug).toBe("string");
                     expect(typeof topic.description).toBe("string");
                 });
+            });
+    });
+});
+
+describe("/api/articles/:article_id", () => {
+    test("GET:200 Should send the requested object on a key of 'article'", () => {
+        return request(app)
+            .get("/api/articles/4")
+            .expect(200)
+            .then((response) => {
+                const article = response.body.article;
+                expect(Object.keys(article).length).toBe(8);
+                expect(typeof article.author).toBe("string");
+                expect(typeof article.title).toBe("string");
+                expect(typeof article.article_id).toBe("number");
+                expect(typeof article.body).toBe("string");
+                expect(typeof article.topic).toBe("string");
+                expect(typeof article.created_at).toBe("string");
+                expect(typeof article.votes).toBe("number");
+                expect(typeof article.article_img_url).toBe("string");
             });
     });
 });
