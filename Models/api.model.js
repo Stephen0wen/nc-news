@@ -5,7 +5,7 @@ exports.selectTopics = () => {
         .query(
             `
     SELECT *
-    FROM topics`
+    FROM topics;`
         )
         .then(({ rows }) => {
             return rows;
