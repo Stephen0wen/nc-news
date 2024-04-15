@@ -7,6 +7,7 @@ exports.getArticle = (request, response, next) => {
             response.status(200).send({ article });
         })
         .catch((error) => {
+            console.log(error.code);
             next(error);
         });
 };

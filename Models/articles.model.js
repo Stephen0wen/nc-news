@@ -17,5 +17,8 @@ exports.selectArticleById = (id) => {
                 });
             }
             return rows[0];
+        })
+        .catch((error) => {
+            return Promise.reject(error);
         });
 };
