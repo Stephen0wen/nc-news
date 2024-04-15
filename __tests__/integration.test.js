@@ -67,7 +67,7 @@ describe("/api/articles/:article_id", () => {
                 expect(response.body.msg).toBe("Article not found");
             });
     });
-    test.only("GET:400 If an invalid id is given, an arror message should be sent", () => {
+    test("GET:400 If an invalid id is given, an arror message should be sent", () => {
         return request(app)
             .get("/api/articles/string")
             .expect(400)
