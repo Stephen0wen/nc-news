@@ -1,5 +1,10 @@
 const articlesRouter = require("express").Router({ mergeParams: true });
-const { getArticle } = require("../Controllers/articles.controller");
+const {
+    getArticles,
+    getArticle,
+} = require("../Controllers/articles.controller");
+
+articlesRouter.route("/").get(getArticles);
 
 articlesRouter.route("/:article_id").get(getArticle);
 
