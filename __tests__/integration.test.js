@@ -49,6 +49,9 @@ describe("/api/articles", () => {
             .then((response) => {
                 const articles = response.body.articles;
                 expect(articles.length).toBe(13);
+                expect(articles).toBeSortedBy("created_at", {
+                    descending: true,
+                });
                 articles.forEach((article) => {
                     expect(Object.keys(article).length).toBe(8);
                     expect(typeof article.author).toBe("string");
