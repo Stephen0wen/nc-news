@@ -67,6 +67,14 @@ describe("/api/articles/:article_id", () => {
                 expect(response.body.msg).toBe("Article not found");
             });
     });
+    test("GET:400 If an invalid id is given, an arror message should be sent", () => {
+        return request(app)
+            .get("/api/articles/string")
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request");
+            });
+    });
 });
 
 describe("any other path", () => {

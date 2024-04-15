@@ -17,4 +17,10 @@ app.use((error, request, response, next) => {
     next(error);
 });
 
+app.use((error, request, response, next) => {
+    if (error.code === "22P02") {
+        response.status(400).send({ msg: "Invalid Request" });
+    }
+});
+
 module.exports = app;
