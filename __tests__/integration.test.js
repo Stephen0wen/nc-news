@@ -59,6 +59,14 @@ describe("/api/articles/:article_id", () => {
                 expect(typeof article.article_img_url).toBe("string");
             });
     });
+    test("GET:404 If a valid id is given, but id does not exist in the database, an arror message should be sent", () => {
+        return request(app)
+            .get("/api/articles/9999")
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Article not found");
+            });
+    });
 });
 
 describe("any other path", () => {
