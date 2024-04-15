@@ -8,3 +8,13 @@ In order to run this repo lacally, after cloning it you must create .env files c
 echo "PGDATABASE=nc_news" >> .env.development
 echo "PGDATABASE=nc_news_test" >> .env.test
 ```
+
+---
+
+It will then be possible to create the databases using setup.sql file:
+
+```
+psql -f ./db/setup.sql
+```
+
+---
