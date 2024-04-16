@@ -297,6 +297,22 @@ describe("/api/comments/:comment_id", () => {
                 expect(response.body).toEqual({});
             });
     });
+    test("DELETE:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
+        return request(app)
+            .delete("/api/comments/9999")
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Comment not found");
+            });
+    });
+    test("DELETE 400 If an invalid id is given, an error message should be sent", () => {
+        return request(app)
+            .delete("/api/comments/wrong_format")
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request");
+            });
+    });
 });
 
 describe("any other path", () => {
