@@ -124,6 +124,31 @@ describe("/api/articles/:article_id/comments", () => {
                 });
             });
     });
+    test("GET:200 Should send an empty array when given a valid id, which exists, but there are no associated comments", () => {
+        return request(app)
+            .get("/api/articles/2/comments")
+            .expect(200)
+            .then((response) => {
+                const comments = response.body.comments;
+                expect(comments).toEqual([]);
+            });
+    });
+    test("GET:404 If a valid id is given, but id does not exist in the database, an arror message should be sent", () => {
+        return request(app)
+            .get("/api/articles/9999/comments")
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Article not found");
+            });
+    });
+    test("GET:400 If an invalid id is given, an arror message should be sent", () => {
+        return request(app)
+            .get("/api/articles/string_for_id/comments")
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request");
+            });
+    });
 });
 
 describe("any other path", () => {

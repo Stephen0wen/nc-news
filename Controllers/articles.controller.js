@@ -23,7 +23,14 @@ exports.getArticle = (request, response, next) => {
 
 exports.getCommentsByArticle = (request, response, next) => {
     const article_id = request.params.article_id;
-    selectCommentsByArticle(article_id).then((comments) => {
-        response.status(200).send({ comments });
-    });
+    return Promise.all([
+        selectCommentsByArticle(article_id),
+        selectArticleById(article_id),
+    ])
+        .then(([comments]) => {
+            response.status(200).send({ comments });
+        })
+        .catch((error) => {
+            next(error);
+        });
 };
