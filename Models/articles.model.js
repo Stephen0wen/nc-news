@@ -24,7 +24,7 @@ exports.selectArticles = () => {
         });
 };
 
-exports.selectArticleById = (article_id) => {
+exports.selectArticle = (article_id) => {
     return db
         .query(
             `
@@ -40,6 +40,22 @@ exports.selectArticleById = (article_id) => {
                     msg: "Article not found",
                 });
             }
+            return rows[0];
+        });
+};
+
+exports.updateArticle = (article_id, body) => {
+    return db
+        .query(
+            `
+    UPDATE articles
+    SET
+        votes = votes + $1
+    WHERE article_id = $2
+    RETURNING *`,
+            [body.inc_votes, article_id]
+        )
+        .then(({ rows }) => {
             return rows[0];
         });
 };

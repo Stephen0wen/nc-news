@@ -110,6 +110,24 @@ describe("/api/articles/:article_id", () => {
                 expect(response.body.msg).toBe("Invalid Request");
             });
     });
+    test("PATCH:200 Should update the requested article and send the new version on a key of 'article'", () => {
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: 5 })
+            .expect(200)
+            .then((response) => {
+                const article = response.body.article;
+                expect(Object.keys(article).length).toBe(8);
+                expect(typeof article.author).toBe("string");
+                expect(typeof article.title).toBe("string");
+                expect(article.article_id).toBe(1);
+                expect(typeof article.body).toBe("string");
+                expect(typeof article.topic).toBe("string");
+                expect(typeof article.created_at).toBe("string");
+                expect(article.votes).toBe(105);
+                expect(typeof article.article_img_url).toBe("string");
+            });
+    });
 });
 
 describe("/api/articles/:article_id/comments", () => {
