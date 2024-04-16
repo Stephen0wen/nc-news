@@ -94,7 +94,7 @@ describe("/api/articles/:article_id", () => {
                 expect(typeof article.article_img_url).toBe("string");
             });
     });
-    test("GET:404 If a valid id is given, but id does not exist in the database, an arror message should be sent", () => {
+    test("GET:404 If a valid id is given, but it does not exist in the database, an arror message should be sent", () => {
         return request(app)
             .get("/api/articles/9999")
             .expect(404)
@@ -108,6 +108,55 @@ describe("/api/articles/:article_id", () => {
             .expect(400)
             .then((response) => {
                 expect(response.body.msg).toBe("Invalid Request");
+            });
+    });
+    test("PATCH:200 Should update the requested article and send the new version on a key of 'article'", () => {
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: 5 })
+            .expect(200)
+            .then((response) => {
+                const article = response.body.article;
+                expect(Object.keys(article).length).toBe(8);
+                expect(article.author).toBe("butter_bridge");
+                expect(article.title).toBe(
+                    "Living in the shadow of a great man"
+                );
+                expect(article.article_id).toBe(1);
+                expect(article.body).toBe("I find this existence challenging");
+                expect(article.topic).toBe("mitch");
+                expect(typeof article.created_at).toBe("string");
+                expect(article.votes).toBe(105);
+                expect(article.article_img_url).toBe(
+                    "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+                );
+            });
+    });
+    test("PATCH:404 If a valid id is given, but it does not exist in the database, an arror message should be sent", () => {
+        return request(app)
+            .patch("/api/articles/9999")
+            .send({ inc_votes: 5 })
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Article not found");
+            });
+    });
+    test("PATCH:400 If an invalid id is given, an arror message should be sent", () => {
+        return request(app)
+            .patch("/api/articles/not_an_id")
+            .send({ inc_votes: 5 })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request");
+            });
+    });
+    test("PATCH:400 If an invalid request body is given, an error message should be sent", () => {
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ wrong_key: 5 })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request Body");
             });
     });
 });
