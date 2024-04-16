@@ -103,6 +103,29 @@ describe("/api/articles/:article_id", () => {
     });
 });
 
+describe("/api/articles/:article_id/comments", () => {
+    test("GET:200 Should send an array of comments for the given article_id", () => {
+        return request(app)
+            .get("/api/articles/9/comments")
+            .expect(200)
+            .then((response) => {
+                const comments = response.body.comments;
+                expect(comments.length).toBe(2);
+                expect(comments).toBeSortedBy("created_at", {
+                    descending: true,
+                });
+                comments.forEach((comment) => {
+                    expect(typeof comment.comment_id).toBe("number");
+                    expect(typeof comment.votes).toBe("number");
+                    expect(typeof comment.created_at).toBe("string");
+                    expect(typeof comment.author).toBe("string");
+                    expect(typeof comment.body).toBe("string");
+                    expect(typeof comment.article_id).toBe("number");
+                });
+            });
+    });
+});
+
 describe("any other path", () => {
     test("GET:404 Should send a 404 error with a message when an invalid path is given", () => {
         return request(app)
