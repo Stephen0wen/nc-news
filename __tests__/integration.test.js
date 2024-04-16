@@ -50,9 +50,6 @@ describe("/api/articles", () => {
             .then((response) => {
                 const articles = response.body.articles;
                 expect(articles.length).toBe(13);
-                expect(articles).toBeSortedBy("created_at", {
-                    descending: true,
-                });
                 articles.forEach((article) => {
                     expect(Object.keys(article).length).toBe(8);
                     expect(typeof article.author).toBe("string");
@@ -63,6 +60,17 @@ describe("/api/articles", () => {
                     expect(typeof article.votes).toBe("number");
                     expect(typeof article.article_img_url).toBe("string");
                     expect(typeof article.comment_count).toBe("string");
+                });
+            });
+    });
+    test("GET:200 Articles should be sorted by 'created_at' property by default", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then((response) => {
+                const articles = response.body.articles;
+                expect(articles).toBeSortedBy("created_at", {
+                    descending: true,
                 });
             });
     });
@@ -112,9 +120,6 @@ describe("/api/articles/:article_id/comments", () => {
             .then((response) => {
                 const comments = response.body.comments;
                 expect(comments.length).toBe(2);
-                expect(comments).toBeSortedBy("created_at", {
-                    descending: true,
-                });
                 comments.forEach((comment) => {
                     expect(typeof comment.comment_id).toBe("number");
                     expect(typeof comment.votes).toBe("number");
@@ -122,6 +127,17 @@ describe("/api/articles/:article_id/comments", () => {
                     expect(typeof comment.author).toBe("string");
                     expect(typeof comment.body).toBe("string");
                     expect(typeof comment.article_id).toBe("number");
+                });
+            });
+    });
+    test("GET:200 Comments should be sorted by 'created_at' property by default", () => {
+        return request(app)
+            .get("/api/articles/9/comments")
+            .expect(200)
+            .then((response) => {
+                const comments = response.body.comments;
+                expect(comments).toBeSortedBy("created_at", {
+                    descending: true,
                 });
             });
     });
