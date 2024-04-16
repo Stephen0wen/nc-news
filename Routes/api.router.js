@@ -1,6 +1,6 @@
 const apiRouter = require("express").Router();
 const { getApi, getTopics } = require("../Controllers/api.controller");
-const { articlesRouter, commentsRouter } = require("./index");
+const { articlesRouter, commentsRouter } = require("./");
 
 apiRouter.route("/").get(getApi);
 
