@@ -1,5 +1,15 @@
-const apiRouter = require("./api.router");
+const topicsRouter = require("./topics.router");
 const articlesRouter = require("./articles.router");
 const commentsRouter = require("./comments.router");
+const { getApi, getTopics } = require("../Controllers/api.controller");
+const apiRouter = require("express").Router();
 
-module.exports = { apiRouter, articlesRouter, commentsRouter };
+apiRouter.route("/").get(getApi);
+
+apiRouter.use("/topics", topicsRouter);
+
+apiRouter.use("/articles", articlesRouter);
+
+apiRouter.use("/comments", commentsRouter);
+
+module.exports = { apiRouter, topicsRouter, articlesRouter, commentsRouter };

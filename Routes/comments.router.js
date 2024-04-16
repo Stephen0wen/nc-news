@@ -1,5 +1,5 @@
-const commentsRouter = require("express").Router({ mergeParams: true });
 const { deleteComment } = require("../Controllers/comments.controller");
+const commentsRouter = require("express").Router({ mergeParams: true });
 
 commentsRouter.route("/:comment_id").delete(deleteComment);
 

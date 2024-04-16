@@ -1,4 +1,3 @@
-const articlesRouter = require("express").Router({ mergeParams: true });
 const {
     getArticles,
     getArticle,
@@ -6,6 +5,7 @@ const {
     getCommentsByArticle,
     postCommentByArticle,
 } = require("../Controllers/articles.controller");
+const articlesRouter = require("express").Router({ mergeParams: true });
 
 articlesRouter.route("/").get(getArticles);
 
