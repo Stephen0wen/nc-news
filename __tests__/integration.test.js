@@ -86,7 +86,7 @@ describe("/api/articles/:article_id", () => {
                 expect(Object.keys(article).length).toBe(8);
                 expect(typeof article.author).toBe("string");
                 expect(typeof article.title).toBe("string");
-                expect(typeof article.article_id).toBe("number");
+                expect(article.article_id).toBe(4);
                 expect(typeof article.body).toBe("string");
                 expect(typeof article.topic).toBe("string");
                 expect(typeof article.created_at).toBe("string");
@@ -126,7 +126,7 @@ describe("/api/articles/:article_id/comments", () => {
                     expect(typeof comment.created_at).toBe("string");
                     expect(typeof comment.author).toBe("string");
                     expect(typeof comment.body).toBe("string");
-                    expect(typeof comment.article_id).toBe("number");
+                    expect(comment.article_id).toBe(9);
                 });
             });
     });
@@ -182,7 +182,7 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(typeof comment.created_at).toBe("string");
                 expect(typeof comment.author).toBe("string");
                 expect(typeof comment.body).toBe("string");
-                expect(typeof comment.article_id).toBe("number");
+                expect(comment.article_id).toBe(2);
             });
     });
     test("POST:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
