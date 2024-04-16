@@ -98,7 +98,7 @@ describe("/api/articles/:article_id", () => {
                 );
             });
     });
-    test("GET:404 If a valid id is given, but it does not exist in the database, an arror message should be sent", () => {
+    test("GET:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
         return request(app)
             .get("/api/articles/9999")
             .expect(404)
@@ -106,7 +106,7 @@ describe("/api/articles/:article_id", () => {
                 expect(response.body.msg).toBe("Article not found");
             });
     });
-    test("GET:400 If an invalid id is given, an arror message should be sent", () => {
+    test("GET:400 If an invalid id is given, an error message should be sent", () => {
         return request(app)
             .get("/api/articles/string")
             .expect(400)
@@ -136,7 +136,7 @@ describe("/api/articles/:article_id", () => {
                 );
             });
     });
-    test("PATCH:404 If a valid id is given, but it does not exist in the database, an arror message should be sent", () => {
+    test("PATCH:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
         return request(app)
             .patch("/api/articles/9999")
             .send({ inc_votes: 5 })
@@ -145,7 +145,7 @@ describe("/api/articles/:article_id", () => {
                 expect(response.body.msg).toBe("Article not found");
             });
     });
-    test("PATCH:400 If an invalid id is given, an arror message should be sent", () => {
+    test("PATCH:400 If an invalid id is given, an error message should be sent", () => {
         return request(app)
             .patch("/api/articles/not_an_id")
             .send({ inc_votes: 5 })
@@ -211,7 +211,7 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(response.body.msg).toBe("Article not found");
             });
     });
-    test("GET:400 If an invalid id is given, an arror message should be sent", () => {
+    test("GET:400 If an invalid id is given, an error message should be sent", () => {
         return request(app)
             .get("/api/articles/string_for_id/comments")
             .expect(400)
@@ -250,7 +250,7 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(response.body.msg).toBe("Article not found");
             });
     });
-    test("POST:400 If an invalid id is given, an arror message should be sent", () => {
+    test("POST:400 If an invalid id is given, an error message should be sent", () => {
         return request(app)
             .post("/api/articles/dodgyID/comments")
             .send({
@@ -284,6 +284,33 @@ describe("/api/articles/:article_id/comments", () => {
             .expect(404)
             .then((response) => {
                 expect(response.body.msg).toBe("User not found");
+            });
+    });
+});
+
+describe("/api/comments/:comment_id", () => {
+    test("DELETE:200 Should delete the comment from the database and send it back to the client", () => {
+        return request(app)
+            .delete("/api/comments/5")
+            .expect(204)
+            .then((response) => {
+                expect(response.body).toEqual({});
+            });
+    });
+    test("DELETE:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
+        return request(app)
+            .delete("/api/comments/9999")
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Comment not found");
+            });
+    });
+    test("DELETE 400 If an invalid id is given, an error message should be sent", () => {
+        return request(app)
+            .delete("/api/comments/wrong_format")
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request");
             });
     });
 });
