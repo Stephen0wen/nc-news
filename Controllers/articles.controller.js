@@ -39,7 +39,11 @@ exports.getCommentsByArticle = (request, response, next) => {
 exports.postCommentByArticle = (request, response, next) => {
     const article_id = request.params.article_id;
     const body = request.body;
-    insertCommentByArticle(article_id, body).then((comment) => {
-        response.status(201).send({ comment });
-    });
+    insertCommentByArticle(article_id, body)
+        .then((comment) => {
+            response.status(201).send({ comment });
+        })
+        .catch((error) => {
+            next(error);
+        });
 };

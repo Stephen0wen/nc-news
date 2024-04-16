@@ -41,9 +41,6 @@ exports.selectArticleById = (article_id) => {
                 });
             }
             return rows[0];
-        })
-        .catch((error) => {
-            return Promise.reject(error);
         });
 };
 
@@ -59,9 +56,6 @@ exports.selectCommentsByArticle = (article_id, body) => {
         )
         .then(({ rows }) => {
             return rows;
-        })
-        .catch((error) => {
-            return Promise.reject(error);
         });
 };
 

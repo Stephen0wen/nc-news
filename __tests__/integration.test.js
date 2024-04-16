@@ -5,6 +5,7 @@ const request = require("supertest");
 const db = require("../db/connection");
 const { describe, test } = require("@jest/globals");
 const endpoints = require("../endpoints.json");
+const { response } = require("express");
 
 beforeEach(() => {
     return seed(data);
@@ -133,7 +134,7 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(comments).toEqual([]);
             });
     });
-    test("GET:404 If a valid id is given, but id does not exist in the database, an arror message should be sent", () => {
+    test("GET:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
         return request(app)
             .get("/api/articles/9999/comments")
             .expect(404)
@@ -166,6 +167,42 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(typeof comment.author).toBe("string");
                 expect(typeof comment.body).toBe("string");
                 expect(typeof comment.article_id).toBe("number");
+            });
+    });
+    test("POST:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
+        return request(app)
+            .post("/api/articles/9999/comments")
+            .send({
+                username: "rogersop",
+                body: "This is a test comment...",
+            })
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Article not found");
+            });
+    });
+    test("POST:400 If an invalid id is given, an arror message should be sent", () => {
+        return request(app)
+            .post("/api/articles/dodgyID/comments")
+            .send({
+                username: "rogersop",
+                body: "This is a test comment...",
+            })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request");
+            });
+    });
+    test("POST:400 If an invalid request body is given, an error message should be sent", () => {
+        return request(app)
+            .post("/api/articles/2/comments")
+            .send({
+                username: "rogersop",
+                notBody: "This is not a comment...",
+            })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request Body");
             });
     });
 });
