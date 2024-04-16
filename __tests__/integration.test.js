@@ -274,6 +274,18 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(response.body.msg).toBe("Invalid Request Body");
             });
     });
+    test("POST:404 If a valid request body is given, but the username is not in the database, an error message should be sent", () => {
+        return request(app)
+            .post("/api/articles/2/comments")
+            .send({
+                username: "clandestine_user",
+                body: "This is a test comment",
+            })
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("User not found");
+            });
+    });
 });
 
 describe("any other path", () => {

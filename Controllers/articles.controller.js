@@ -3,6 +3,7 @@ const {
     selectArticle,
     updateArticle,
     selectCommentsByArticle,
+    checkUser,
     insertCommentByArticle,
 } = require("../Models/articles.model");
 

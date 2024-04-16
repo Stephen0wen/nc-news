@@ -32,6 +32,13 @@ app.use((error, request, response, next) => {
 });
 
 app.use((error, request, response, next) => {
+    if (error.code === "23503" && error.constraint === "comments_author_fkey") {
+        response.status(404).send({ msg: "User not found" });
+    }
+    next(error);
+});
+
+app.use((error, request, response, next) => {
     if (error.code === "23503") {
         response.status(404).send({ msg: "Article not found" });
     }
