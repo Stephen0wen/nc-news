@@ -149,6 +149,25 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(response.body.msg).toBe("Invalid Request");
             });
     });
+    test("POST:201 Should insert the new comment into the database and send the object back to the client", () => {
+        return request(app)
+            .post("/api/articles/2/comments")
+            .send({
+                username: "rogersop",
+                body: "This is a test comment...",
+            })
+            .expect(201)
+            .then((response) => {
+                const comment = response.body.comment;
+                expect(Object.keys(comment).length).toBe(6);
+                expect(typeof comment.comment_id).toBe("number");
+                expect(typeof comment.votes).toBe("number");
+                expect(typeof comment.created_at).toBe("string");
+                expect(typeof comment.author).toBe("string");
+                expect(typeof comment.body).toBe("string");
+                expect(typeof comment.article_id).toBe("number");
+            });
+    });
 });
 
 describe("any other path", () => {
