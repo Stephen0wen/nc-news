@@ -84,14 +84,18 @@ describe("/api/articles/:article_id", () => {
             .then((response) => {
                 const article = response.body.article;
                 expect(Object.keys(article).length).toBe(8);
-                expect(typeof article.author).toBe("string");
-                expect(typeof article.title).toBe("string");
+                expect(article.author).toBe("rogersop");
+                expect(article.title).toBe("Student SUES Mitch!");
                 expect(article.article_id).toBe(4);
-                expect(typeof article.body).toBe("string");
-                expect(typeof article.topic).toBe("string");
+                expect(article.body).toBe(
+                    "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages"
+                );
+                expect(article.topic).toBe("mitch");
                 expect(typeof article.created_at).toBe("string");
-                expect(typeof article.votes).toBe("number");
-                expect(typeof article.article_img_url).toBe("string");
+                expect(article.votes).toBe(0);
+                expect(article.article_img_url).toBe(
+                    "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+                );
             });
     });
     test("GET:404 If a valid id is given, but it does not exist in the database, an arror message should be sent", () => {
@@ -226,11 +230,11 @@ describe("/api/articles/:article_id/comments", () => {
             .then((response) => {
                 const comment = response.body.comment;
                 expect(Object.keys(comment).length).toBe(6);
-                expect(typeof comment.comment_id).toBe("number");
-                expect(typeof comment.votes).toBe("number");
+                expect(comment.comment_id).toBe(19);
+                expect(comment.votes).toBe(0);
                 expect(typeof comment.created_at).toBe("string");
-                expect(typeof comment.author).toBe("string");
-                expect(typeof comment.body).toBe("string");
+                expect(comment.author).toBe("rogersop");
+                expect(comment.body).toBe("This is a test comment...");
                 expect(comment.article_id).toBe(2);
             });
     });
