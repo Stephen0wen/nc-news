@@ -21,6 +21,21 @@ app.use((error, request, response, next) => {
     if (error.code === "22P02") {
         response.status(400).send({ msg: "Invalid Request" });
     }
+    next(error);
+});
+
+app.use((error, request, response, next) => {
+    if (error.code === "23502") {
+        response.status(400).send({ msg: "Invalid Request Body" });
+    }
+    next(error);
+});
+
+app.use((error, request, response, next) => {
+    if (error.code === "23503") {
+        response.status(404).send({ msg: "Article not found" });
+    }
+    next(error);
 });
 
 module.exports = app;

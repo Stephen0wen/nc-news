@@ -24,14 +24,14 @@ exports.selectArticles = () => {
         });
 };
 
-exports.selectArticleById = (id) => {
+exports.selectArticleById = (article_id) => {
     return db
         .query(
             `
     SELECT *
     FROM articles
     WHERE article_id = $1`,
-            [id]
+            [article_id]
         )
         .then(({ rows }) => {
             if (rows.length === 0) {
@@ -41,13 +41,10 @@ exports.selectArticleById = (id) => {
                 });
             }
             return rows[0];
-        })
-        .catch((error) => {
-            return Promise.reject(error);
         });
 };
 
-exports.selectCommentsByArticle = (id) => {
+exports.selectCommentsByArticle = (article_id, body) => {
     return db
         .query(
             `
@@ -55,12 +52,26 @@ exports.selectCommentsByArticle = (id) => {
             FROM comments
             Where article_id = $1
             ORDER BY created_at DESC`,
-            [id]
+            [article_id]
         )
         .then(({ rows }) => {
             return rows;
-        })
-        .catch((error) => {
-            return Promise.reject(error);
+        });
+};
+
+exports.insertCommentByArticle = (article_id, body) => {
+    const created_at = new Date();
+    return db
+        .query(
+            `
+    INSERT INTO comments
+        (article_id, author, body, created_at)
+    VALUES
+        ($1, $2, $3, $4)
+    RETURNING *`,
+            [article_id, body.username, body.body, created_at]
+        )
+        .then(({ rows }) => {
+            return rows[0];
         });
 };
