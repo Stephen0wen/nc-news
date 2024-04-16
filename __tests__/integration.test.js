@@ -94,7 +94,7 @@ describe("/api/articles/:article_id", () => {
                 expect(typeof article.article_img_url).toBe("string");
             });
     });
-    test("GET:404 If a valid id is given, but id does not exist in the database, an arror message should be sent", () => {
+    test("GET:404 If a valid id is given, but it does not exist in the database, an arror message should be sent", () => {
         return request(app)
             .get("/api/articles/9999")
             .expect(404)
@@ -126,6 +126,33 @@ describe("/api/articles/:article_id", () => {
                 expect(typeof article.created_at).toBe("string");
                 expect(article.votes).toBe(105);
                 expect(typeof article.article_img_url).toBe("string");
+            });
+    });
+    test("PATCH:404 If a valid id is given, but it does not exist in the database, an arror message should be sent", () => {
+        return request(app)
+            .patch("/api/articles/9999")
+            .send({ inc_votes: 5 })
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Article not found");
+            });
+    });
+    test("PATCH:400 If an invalid id is given, an arror message should be sent", () => {
+        return request(app)
+            .patch("/api/articles/not_an_id")
+            .send({ inc_votes: 5 })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request");
+            });
+    });
+    test("PATCH:400 If an invalid request body is given, an error message should be sent", () => {
+        return request(app)
+            .patch("/api/articles/1")
+            .send({ wrong_key: 5 })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request Body");
             });
     });
 });

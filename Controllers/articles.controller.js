@@ -26,9 +26,13 @@ exports.getArticle = (request, response, next) => {
 exports.patchArticle = (request, response, next) => {
     const article_id = request.params.article_id;
     const body = request.body;
-    updateArticle(article_id, body).then((article) => {
-        response.status(200).send({ article });
-    });
+    updateArticle(article_id, body)
+        .then((article) => {
+            response.status(200).send({ article });
+        })
+        .catch((error) => {
+            next(error);
+        });
 };
 
 exports.getCommentsByArticle = (request, response, next) => {
