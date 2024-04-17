@@ -136,13 +136,35 @@ describe("/api/articles", () => {
 });
 
 describe("/api/articles/:article_id", () => {
-    test("GET:200 Should send the requested object on a key of 'article'", () => {
+    test("GET:200 Should send the correct requested object on a key of 'article' when there are comments", () => {
+        return request(app)
+            .get("/api/articles/1")
+            .expect(200)
+            .then((response) => {
+                const article = response.body.article;
+                expect(Object.keys(article).length).toBe(9);
+                expect(article.author).toBe("butter_bridge");
+                expect(article.title).toBe(
+                    "Living in the shadow of a great man"
+                );
+                expect(article.article_id).toBe(1);
+                expect(article.body).toBe("I find this existence challenging");
+                expect(article.topic).toBe("mitch");
+                expect(typeof article.created_at).toBe("string");
+                expect(article.votes).toBe(100);
+                expect(article.article_img_url).toBe(
+                    "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+                );
+                expect(article.comment_count).toBe(11);
+            });
+    });
+    test("GET:200 Should send the correct requested object on a key of 'article' when there are no comments", () => {
         return request(app)
             .get("/api/articles/4")
             .expect(200)
             .then((response) => {
                 const article = response.body.article;
-                expect(Object.keys(article).length).toBe(8);
+                expect(Object.keys(article).length).toBe(9);
                 expect(article.author).toBe("rogersop");
                 expect(article.title).toBe("Student SUES Mitch!");
                 expect(article.article_id).toBe(4);
@@ -155,6 +177,7 @@ describe("/api/articles/:article_id", () => {
                 expect(article.article_img_url).toBe(
                     "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
                 );
+                expect(article.comment_count).toBe(0);
             });
     });
     test("GET:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
