@@ -42,7 +42,7 @@ describe("/api/topics", () => {
     });
 });
 
-describe.only("/api/articles", () => {
+describe("/api/articles", () => {
     test("GET:200 Should send an array of articles to the client", () => {
         return request(app)
             .get("/api/articles")
