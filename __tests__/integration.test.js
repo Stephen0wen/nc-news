@@ -42,7 +42,7 @@ describe("/api/topics", () => {
     });
 });
 
-describe("/api/articles", () => {
+describe.only("/api/articles", () => {
     test("GET:200 Should send an array of articles to the client", () => {
         return request(app)
             .get("/api/articles")
@@ -59,7 +59,7 @@ describe("/api/articles", () => {
                     expect(typeof article.created_at).toBe("string");
                     expect(typeof article.votes).toBe("number");
                     expect(typeof article.article_img_url).toBe("string");
-                    expect(typeof article.comment_count).toBe("string");
+                    expect(typeof article.comment_count).toBe("number");
                 });
             });
     });
@@ -103,7 +103,7 @@ describe("/api/articles", () => {
                 expect(articles.length).toBe(0);
             });
     });
-    test("GET:404 When topic query is valid, but topic does not exist in the database, an error message should be sent", () => {
+    test("GET:404 When the topic query is valid, but topic does not exist in the database, an error message should be sent", () => {
         return request(app)
             .get("/api/articles")
             .query({ topic: "Fake_Topic" })
@@ -112,7 +112,7 @@ describe("/api/articles", () => {
                 expect(error.body.msg).toBe("Topic not found");
             });
     });
-    test("GET:200 Invalid queries should be ignored", () => {
+    test("GET:200 Invalid query keys should be ignored", () => {
         return request(app)
             .get("/api/articles")
             .expect(200)
@@ -129,7 +129,49 @@ describe("/api/articles", () => {
                     expect(typeof article.created_at).toBe("string");
                     expect(typeof article.votes).toBe("number");
                     expect(typeof article.article_img_url).toBe("string");
-                    expect(typeof article.comment_count).toBe("string");
+                    expect(typeof article.comment_count).toBe("number");
+                });
+            });
+    });
+    test("GET:200 Should accept an 'order' query which can set the sort order to either asc(ending) or desc(ending)", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .query({ order: "asc" })
+            .then((response) => {
+                const articles = response.body.articles;
+                expect(articles).toBeSortedBy("created_at");
+            });
+    });
+    test("GET:200 Should accept a 'sort_by' query which determines which column the response should be sorted by", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .query({ sort_by: "comment_count" })
+            .then((response) => {
+                const articles = response.body.articles;
+                expect(articles).toBeSortedBy("comment_count", {
+                    descending: true,
+                });
+            });
+    });
+    test("GET:200 Queries should all function concurrently", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .query({ sort_by: "title", order: "asc", topic: "mitch" })
+            .then((response) => {
+                const articles = response.body.articles;
+                expect(articles).toBeSortedBy("title");
+                articles.forEach((article) => {
+                    expect(typeof article.author).toBe("string");
+                    expect(typeof article.title).toBe("string");
+                    expect(typeof article.article_id).toBe("number");
+                    expect(article.topic).toBe("mitch");
+                    expect(typeof article.created_at).toBe("string");
+                    expect(typeof article.votes).toBe("number");
+                    expect(typeof article.article_img_url).toBe("string");
+                    expect(typeof article.comment_count).toBe("number");
                 });
             });
     });
