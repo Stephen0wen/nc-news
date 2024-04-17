@@ -475,6 +475,22 @@ describe("/api/users", () => {
     });
 });
 
+describe("/api/users/:username", () => {
+    test("GET:200 Should send the requested user object on a key of user", () => {
+        return request(app)
+            .get("/api/users/lurker")
+            .expect(200)
+            .then((response) => {
+                const { user } = response.body;
+                expect(user.username).toBe("lurker");
+                expect(user.name).toBe("do_nothing");
+                expect(user.avatar_url).toBe(
+                    "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+                );
+            });
+    });
+});
+
 describe("any other path", () => {
     test("GET:404 Should send a 404 error with a message when an invalid path is given", () => {
         return request(app)
