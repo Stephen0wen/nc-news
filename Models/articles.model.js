@@ -1,6 +1,25 @@
 const db = require("../db/connection");
 
-exports.selectArticles = (topic) => {
+exports.selectArticles = (topic, order = "desc", sort_by = "created_at") => {
+    const upperCaseOrder = order.toUpperCase();
+    const validOrders = ["ASC", "DESC"];
+    const validSortBys = [
+        "author",
+        "title",
+        "article_id",
+        "topic",
+        "created_at",
+        "votes",
+        "comment_count",
+    ];
+
+    if (
+        !validOrders.includes(upperCaseOrder) ||
+        !validSortBys.includes(sort_by)
+    ) {
+        return Promise.reject({ status: 400, msg: "Invalid Query Value" });
+    }
+
     const sqlArray = [];
     let sqlString = `
     SELECT
@@ -11,7 +30,7 @@ exports.selectArticles = (topic) => {
         articles.created_at,
         articles.votes,
         articles.article_img_url,
-        COUNT(comment_id) AS comment_count
+        COUNT(comment_id)::INT AS comment_count
     FROM articles
     LEFT JOIN comments
     ON comments.article_id = articles.article_id`;
@@ -23,7 +42,7 @@ exports.selectArticles = (topic) => {
 
     sqlString += `
     GROUP BY articles.article_id
-    ORDER BY articles.created_at DESC;`;
+    ORDER BY ${sort_by} ${upperCaseOrder};`;
 
     return db.query(sqlString, sqlArray).then(({ rows }) => {
         return rows;
