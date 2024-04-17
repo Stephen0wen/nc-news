@@ -13,6 +13,6 @@ exports.getUser = (request, response, next) => {
             response.status(200).send({ user });
         })
         .catch((error) => {
-            console.log(error);
+            next(error);
         });
 };

@@ -489,6 +489,14 @@ describe("/api/users/:username", () => {
                 );
             });
     });
+    test("GET:404 If the requested username is not in the database, an error should be sent", () => {
+        return request(app)
+            .get("/api/users/waldo")
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("User not found");
+            });
+    });
 });
 
 describe("any other path", () => {
