@@ -1,5 +1,4 @@
 const db = require("../db/connection");
-const selectTopic = require("../Models/topics.model");
 
 exports.selectArticles = (topic) => {
     const sqlArray = [];
