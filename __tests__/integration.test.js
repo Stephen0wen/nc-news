@@ -74,6 +74,65 @@ describe("/api/articles", () => {
                 });
             });
     });
+    test("GET:200 Should accept a topic query, which filters the response to only include articles with the given topic", () => {
+        return request(app)
+            .get("/api/articles")
+            .query({ topic: "cats" })
+            .expect(200)
+            .then((response) => {
+                const articles = response.body.articles;
+                expect(articles.length).toBe(1);
+                expect(articles[0].title).toBe(
+                    "UNCOVERED: catspiracy to bring down democracy"
+                );
+                expect(articles[0].topic).toBe("cats");
+                expect(articles[0].author).toBe("rogersop");
+                expect(typeof articles[0].created_at).toBe("string");
+                expect(articles[0].article_img_url).toBe(
+                    "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+                );
+            });
+    });
+    test("GET:200 When topic query exists but has no associated articles, an empty array should be sent", () => {
+        return request(app)
+            .get("/api/articles")
+            .query({ topic: "paper" })
+            .expect(200)
+            .then((response) => {
+                const articles = response.body.articles;
+                expect(articles.length).toBe(0);
+            });
+    });
+    test("GET:404 When topic query is valid, but topic does not exist in the database, an error message should be sent", () => {
+        return request(app)
+            .get("/api/articles")
+            .query({ topic: "Fake_Topic" })
+            .expect(404)
+            .then((error) => {
+                expect(error.body.msg).toBe("Topic not found");
+            });
+    });
+    test("GET:200 Invalid queries should be ignored", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .query({ tropic: "mitch" })
+            .then((response) => {
+                const articles = response.body.articles;
+                expect(articles.length).toBe(13);
+                articles.forEach((article) => {
+                    expect(Object.keys(article).length).toBe(8);
+                    expect(typeof article.author).toBe("string");
+                    expect(typeof article.title).toBe("string");
+                    expect(typeof article.article_id).toBe("number");
+                    expect(typeof article.topic).toBe("string");
+                    expect(typeof article.created_at).toBe("string");
+                    expect(typeof article.votes).toBe("number");
+                    expect(typeof article.article_img_url).toBe("string");
+                    expect(typeof article.comment_count).toBe("string");
+                });
+            });
+    });
 });
 
 describe("/api/articles/:article_id", () => {

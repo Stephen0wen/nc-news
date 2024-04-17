@@ -3,14 +3,25 @@ const {
     selectArticle,
     updateArticle,
     selectCommentsByArticle,
-    checkUser,
     insertCommentByArticle,
 } = require("../Models/articles.model");
+const { selectTopic } = require("../Models/topics.model");
 
 exports.getArticles = (request, response, next) => {
-    selectArticles().then((articles) => {
-        response.status(200).send({ articles });
-    });
+    const { topic } = request.query;
+    const promises = [selectArticles(topic)];
+
+    if (topic) {
+        promises.push(selectTopic(topic));
+    }
+
+    return Promise.all(promises)
+        .then(([articles]) => {
+            response.status(200).send({ articles });
+        })
+        .catch((error) => {
+            next(error);
+        });
 };
 
 exports.getArticle = (request, response, next) => {
