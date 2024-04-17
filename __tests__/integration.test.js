@@ -175,6 +175,24 @@ describe("/api/articles", () => {
                 });
             });
     });
+    test("GET:400 Invalid sort_by query values should cause an error to be sent", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(400)
+            .query({ sort_by: "not_a_column" })
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Query Value");
+            });
+    });
+    test("GET:400 Invalid sort_by query values should cause an error to be sent", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(400)
+            .query({ order: "any_old_how" })
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Query Value");
+            });
+    });
 });
 
 describe("/api/articles/:article_id", () => {
