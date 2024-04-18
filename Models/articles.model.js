@@ -49,6 +49,28 @@ exports.selectArticles = (topic, order = "desc", sort_by = "created_at") => {
     });
 };
 
+exports.insertArticle = (author, title, body, topic, article_img_url) => {
+    const created_at = new Date();
+    if (!article_img_url) {
+        article_img_url =
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700";
+    }
+    return db
+        .query(
+            `
+    INSERT INTO articles
+        (author, title, body, topic, article_img_url, created_at)
+    VALUES
+        ($1, $2, $3, $4, $5, $6)
+    RETURNING *`,
+            [author, title, body, topic, article_img_url, created_at]
+        )
+        .then(({ rows }) => {
+            rows[0].comment_count = 0;
+            return rows[0];
+        });
+};
+
 exports.selectArticle = (article_id) => {
     return db
         .query(

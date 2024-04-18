@@ -1,5 +1,6 @@
 const {
     selectArticles,
+    insertArticle,
     selectArticle,
     updateArticle,
     selectCommentsByArticle,
@@ -18,6 +19,17 @@ exports.getArticles = (request, response, next) => {
     return Promise.all(promises)
         .then(([articles]) => {
             response.status(200).send({ articles });
+        })
+        .catch((error) => {
+            next(error);
+        });
+};
+
+exports.postArticle = (request, response, next) => {
+    const { author, title, body, topic, article_img_url } = request.body;
+    insertArticle(author, title, body, topic, article_img_url)
+        .then((article) => {
+            response.status(201).send({ article });
         })
         .catch((error) => {
             next(error);
