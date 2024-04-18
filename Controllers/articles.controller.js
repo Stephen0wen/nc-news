@@ -25,7 +25,7 @@ exports.getArticles = (request, response, next) => {
 };
 
 exports.getArticle = (request, response, next) => {
-    const article_id = request.params.article_id;
+    const { article_id } = request.params;
     selectArticle(article_id)
         .then((article) => {
             response.status(200).send({ article });
@@ -36,9 +36,9 @@ exports.getArticle = (request, response, next) => {
 };
 
 exports.patchArticle = (request, response, next) => {
-    const article_id = request.params.article_id;
-    const body = request.body;
-    updateArticle(article_id, body)
+    const { article_id } = request.params;
+    const { inc_votes } = request.body;
+    updateArticle(article_id, inc_votes)
         .then((article) => {
             response.status(200).send({ article });
         })
@@ -48,7 +48,7 @@ exports.patchArticle = (request, response, next) => {
 };
 
 exports.getCommentsByArticle = (request, response, next) => {
-    const article_id = request.params.article_id;
+    const { article_id } = request.params;
     return Promise.all([
         selectCommentsByArticle(article_id),
         selectArticle(article_id),
@@ -62,9 +62,9 @@ exports.getCommentsByArticle = (request, response, next) => {
 };
 
 exports.postCommentByArticle = (request, response, next) => {
-    const article_id = request.params.article_id;
-    const body = request.body;
-    insertCommentByArticle(article_id, body)
+    const { article_id } = request.params;
+    const { username, body } = request.body;
+    insertCommentByArticle(article_id, username, body)
         .then((comment) => {
             response.status(201).send({ comment });
         })
