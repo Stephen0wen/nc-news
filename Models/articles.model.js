@@ -4,10 +4,10 @@ exports.selectArticles = (
     topic,
     order = "desc",
     sort_by = "created_at",
-    limitStr
+    limit,
+    page
 ) => {
     const upperCaseOrder = order.toUpperCase();
-    const limit = Number(limitStr);
     const validOrders = ["ASC", "DESC"];
     const validSortBys = [
         "author",
@@ -24,6 +24,10 @@ exports.selectArticles = (
         !validSortBys.includes(sort_by)
     ) {
         return Promise.reject({ status: 400, msg: "Invalid Query Value" });
+    }
+
+    if (page && limit === undefined) {
+        limit = 10;
     }
 
     const sqlArray = [];
@@ -52,10 +56,17 @@ exports.selectArticles = (
     GROUP BY articles.article_id
     ORDER BY ${sort_by} ${upperCaseOrder}`;
 
-    if (limit) {
+    if (limit || page) {
         sqlString += `
     LIMIT $${insertPosition++}`;
         sqlArray.push(limit);
+    }
+
+    if (page) {
+        const offset = (page - 1) * limit;
+        sqlString += `
+    OFFSET $${insertPosition++}`;
+        sqlArray.push(offset);
     }
 
     sqlString += `;`;

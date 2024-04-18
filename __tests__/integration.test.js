@@ -185,6 +185,40 @@ describe("/api/articles", () => {
                 expect(articles.length).toBe(5);
             });
     });
+    test("GET:200 Should accept a 'p' (page) query, which works alongside the limit query to enable pagination", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .query({
+                limit: 5,
+                p: 2,
+                sort_by: "article_id",
+                order: "asc",
+            })
+            .then((response) => {
+                const articles = response.body.articles;
+                expect(articles.length).toBe(5);
+                articles.forEach((article, index) => {
+                    expect(article.article_id).toBe(index + 6);
+                });
+            });
+    });
+    test("GET:200 If a 'p' (page) query is given with no limit, the limit will default to 10", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .query({
+                p: 2,
+                sort_by: "article_id",
+                order: "asc",
+            })
+            .then((response) => {
+                const articles = response.body.articles;
+                articles.forEach((article, index) => {
+                    expect(article.article_id).toBe(index + 11);
+                });
+            });
+    });
     test("GET:400 Invalid sort_by query values should cause an error to be sent", () => {
         return request(app)
             .get("/api/articles")
