@@ -155,7 +155,7 @@ describe("/api/articles", () => {
                 });
             });
     });
-    test("GET:200 Queries should all function concurrently", () => {
+    test("GET:200 Sort/Filter queries should all function concurrently", () => {
         return request(app)
             .get("/api/articles")
             .expect(200)
@@ -173,6 +173,16 @@ describe("/api/articles", () => {
                     expect(typeof article.article_img_url).toBe("string");
                     expect(typeof article.comment_count).toBe("number");
                 });
+            });
+    });
+    test("GET:200 Should accept a 'limit' query, which causes only the specified number of articles to be sent", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .query({ limit: 5 })
+            .then((response) => {
+                const articles = response.body.articles;
+                expect(articles.length).toBe(5);
             });
     });
     test("GET:400 Invalid sort_by query values should cause an error to be sent", () => {

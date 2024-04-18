@@ -1,7 +1,13 @@
 const db = require("../db/connection");
 
-exports.selectArticles = (topic, order = "desc", sort_by = "created_at") => {
+exports.selectArticles = (
+    topic,
+    order = "desc",
+    sort_by = "created_at",
+    limitStr
+) => {
     const upperCaseOrder = order.toUpperCase();
+    const limit = Number(limitStr);
     const validOrders = ["ASC", "DESC"];
     const validSortBys = [
         "author",
@@ -21,6 +27,7 @@ exports.selectArticles = (topic, order = "desc", sort_by = "created_at") => {
     }
 
     const sqlArray = [];
+    let insertPosition = 1;
     let sqlString = `
     SELECT
         articles.author,
@@ -36,13 +43,22 @@ exports.selectArticles = (topic, order = "desc", sort_by = "created_at") => {
     ON comments.article_id = articles.article_id`;
 
     if (topic) {
-        sqlString += "\nWHERE articles.topic = $1";
+        sqlString += `
+    WHERE articles.topic = $${insertPosition++}`;
         sqlArray.push(topic);
     }
 
     sqlString += `
     GROUP BY articles.article_id
-    ORDER BY ${sort_by} ${upperCaseOrder};`;
+    ORDER BY ${sort_by} ${upperCaseOrder}`;
+
+    if (limit) {
+        sqlString += `
+    LIMIT $${insertPosition++}`;
+        sqlArray.push(limit);
+    }
+
+    sqlString += `;`;
 
     return db.query(sqlString, sqlArray).then(({ rows }) => {
         return rows;
