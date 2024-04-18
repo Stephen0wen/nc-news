@@ -62,10 +62,11 @@ exports.insertArticle = (author, title, body, topic, article_img_url) => {
         (author, title, body, topic, article_img_url, created_at)
     VALUES
         ($1, $2, $3, $4, $5, $6)
-    RETURNING article_id`,
+    RETURNING *`,
             [author, title, body, topic, article_img_url, created_at]
         )
         .then(({ rows }) => {
+            rows[0].comment_count = 0;
             return rows[0];
         });
 };
