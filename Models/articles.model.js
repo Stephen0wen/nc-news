@@ -103,7 +103,7 @@ exports.updateArticle = (article_id, body) => {
         });
 };
 
-exports.selectCommentsByArticle = (article_id, body) => {
+exports.selectCommentsByArticle = (article_id) => {
     return db
         .query(
             `

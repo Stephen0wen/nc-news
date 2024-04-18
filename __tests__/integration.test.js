@@ -431,6 +431,23 @@ describe("/api/articles/:article_id/comments", () => {
 });
 
 describe("/api/comments/:comment_id", () => {
+    test("PATCH:200 Should update the requested comment and send the new version on a key of 'comment'", () => {
+        return request(app)
+            .patch("/api/comments/3")
+            .send({ inc_votes: 5 })
+            .expect(200)
+            .then((response) => {
+                const { comment } = response.body;
+                expect(comment.comment_id).toBe(3);
+                expect(comment.body).toBe(
+                    "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works."
+                );
+                expect(comment.votes).toBe(105);
+                expect(comment.author).toBe("icellusedkars");
+                expect(comment.article_id).toBe(1);
+                expect(typeof comment.created_at).toBe("string");
+            });
+    });
     test("DELETE:200 Should delete the comment from the database and send it back to the client", () => {
         return request(app)
             .delete("/api/comments/5")
