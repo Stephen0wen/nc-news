@@ -37,8 +37,8 @@ exports.getArticle = (request, response, next) => {
 
 exports.patchArticle = (request, response, next) => {
     const { article_id } = request.params;
-    const { body } = request;
-    updateArticle(article_id, body)
+    const { inc_votes } = request.body;
+    updateArticle(article_id, inc_votes)
         .then((article) => {
             response.status(200).send({ article });
         })
@@ -63,8 +63,8 @@ exports.getCommentsByArticle = (request, response, next) => {
 
 exports.postCommentByArticle = (request, response, next) => {
     const { article_id } = request.params;
-    const { body } = request;
-    insertCommentByArticle(article_id, body)
+    const { username, body } = request.body;
+    insertCommentByArticle(article_id, username, body)
         .then((comment) => {
             response.status(201).send({ comment });
         })

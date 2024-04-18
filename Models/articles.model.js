@@ -81,7 +81,7 @@ exports.selectArticle = (article_id) => {
         });
 };
 
-exports.updateArticle = (article_id, body) => {
+exports.updateArticle = (article_id, inc_votes) => {
     return db
         .query(
             `
@@ -90,7 +90,7 @@ exports.updateArticle = (article_id, body) => {
         votes = votes + $1
     WHERE article_id = $2
     RETURNING *`,
-            [body.inc_votes, article_id]
+            [inc_votes, article_id]
         )
         .then(({ rows }) => {
             if (rows.length === 0) {
@@ -118,7 +118,7 @@ exports.selectCommentsByArticle = (article_id) => {
         });
 };
 
-exports.insertCommentByArticle = (article_id, body) => {
+exports.insertCommentByArticle = (article_id, username, body) => {
     const created_at = new Date();
     return db
         .query(
@@ -128,7 +128,7 @@ exports.insertCommentByArticle = (article_id, body) => {
     VALUES
         ($1, $2, $3, $4)
     RETURNING *`,
-            [article_id, body.username, body.body, created_at]
+            [article_id, username, body, created_at]
         )
         .then(({ rows }) => {
             return rows[0];
