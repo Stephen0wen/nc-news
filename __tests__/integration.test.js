@@ -448,6 +448,33 @@ describe("/api/comments/:comment_id", () => {
                 expect(typeof comment.created_at).toBe("string");
             });
     });
+    test("PATCH:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
+        return request(app)
+            .patch("/api/comments/9999")
+            .send({ inc_votes: 5 })
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Comment not found");
+            });
+    });
+    test("PATCH:400 If an invalid id is given, an error message should be sent", () => {
+        return request(app)
+            .patch("/api/comments/fake_id")
+            .send({ inc_votes: 5 })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request");
+            });
+    });
+    test("PATCH:400 If an invalid request body is given, an error message should be sent", () => {
+        return request(app)
+            .patch("/api/comments/3")
+            .send({ wrong_key: 5 })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request Body");
+            });
+    });
     test("DELETE:200 Should delete the comment from the database and send it back to the client", () => {
         return request(app)
             .delete("/api/comments/5")
