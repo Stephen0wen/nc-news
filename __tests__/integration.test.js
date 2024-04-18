@@ -220,6 +220,37 @@ describe("/api/articles", () => {
                 expect(article.comment_count).toBe(0);
             });
     });
+    test("POST:201 Should add a default image url if none is given in the request body", () => {
+        return request(app)
+            .post("/api/articles")
+            .send({
+                author: "icellusedkars",
+                title: "An article about paper",
+                body: "A very long discussion about paper",
+                topic: "paper",
+            })
+            .expect(201)
+            .then((response) => {
+                const { article } = response.body;
+                expect(article.article_img_url).toBe(
+                    "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+                );
+            });
+    });
+    test("POST:400 Invalid request body should cause an error", () => {
+        return request(app)
+            .post("/api/articles")
+            .send({
+                author: "icellusedkars",
+                title: "An article about paper",
+                notBody: "A very long discussion about paper",
+                topic: "paper",
+            })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request Body");
+            });
+    });
 });
 
 describe("/api/articles/:article_id", () => {

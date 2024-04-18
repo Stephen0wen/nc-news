@@ -51,6 +51,10 @@ exports.selectArticles = (topic, order = "desc", sort_by = "created_at") => {
 
 exports.insertArticle = (author, title, body, topic, article_img_url) => {
     const created_at = new Date();
+    if (!article_img_url) {
+        article_img_url =
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700";
+    }
     return db
         .query(
             `
