@@ -49,6 +49,23 @@ exports.selectArticles = (topic, order = "desc", sort_by = "created_at") => {
     });
 };
 
+exports.insertArticle = (author, title, body, topic, article_img_url) => {
+    const created_at = new Date();
+    return db
+        .query(
+            `
+    INSERT INTO articles
+        (author, title, body, topic, article_img_url, created_at)
+    VALUES
+        ($1, $2, $3, $4, $5, $6)
+    RETURNING article_id`,
+            [author, title, body, topic, article_img_url, created_at]
+        )
+        .then(({ rows }) => {
+            return rows[0];
+        });
+};
+
 exports.selectArticle = (article_id) => {
     return db
         .query(

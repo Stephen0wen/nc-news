@@ -1,5 +1,6 @@
 const {
     selectArticles,
+    insertArticle,
     selectArticle,
     updateArticle,
     selectCommentsByArticle,
@@ -21,6 +22,20 @@ exports.getArticles = (request, response, next) => {
         })
         .catch((error) => {
             next(error);
+        });
+};
+
+exports.postArticle = (request, response, next) => {
+    const { author, title, body, topic, article_img_url } = request.body;
+    insertArticle(author, title, body, topic, article_img_url)
+        .then(({ article_id }) => {
+            return selectArticle(article_id);
+        })
+        .then((article) => {
+            response.status(201).send({ article });
+        })
+        .catch((error) => {
+            console.log(error);
         });
 };
 

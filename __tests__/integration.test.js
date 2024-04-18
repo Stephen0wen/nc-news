@@ -193,6 +193,33 @@ describe("/api/articles", () => {
                 expect(response.body.msg).toBe("Invalid Query Value");
             });
     });
+    test("POST:201 Should add an article to the database and send the new article", () => {
+        return request(app)
+            .post("/api/articles")
+            .send({
+                author: "icellusedkars",
+                title: "An article about paper",
+                body: "A very long discussion about paper",
+                topic: "paper",
+                article_img_url:
+                    "https://www.collinsdictionary.com/images/full/paper_111691001.jpg",
+            })
+            .expect(201)
+            .then((response) => {
+                const { article } = response.body;
+                expect(article.author).toBe("icellusedkars");
+                expect(article.title).toBe("An article about paper");
+                expect(article.article_id).toBe(14);
+                expect(article.body).toBe("A very long discussion about paper");
+                expect(article.topic).toBe("paper");
+                expect(article.votes).toBe(0);
+                expect(article.article_img_url).toBe(
+                    "https://www.collinsdictionary.com/images/full/paper_111691001.jpg"
+                );
+                expect(typeof article.created_at).toBe("string");
+                expect(article.comment_count).toBe(0);
+            });
+    });
 });
 
 describe("/api/articles/:article_id", () => {
