@@ -237,6 +237,24 @@ describe("/api/articles", () => {
                 expect(response.body.msg).toBe("Invalid Query Value");
             });
     });
+    test("GET:400 Invalid limit query values should cause an error to be sent", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(400)
+            .query({ limit: "not_a_valid_limit" })
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Query Value");
+            });
+    });
+    test("GET:400 Invalid page query should cause an error to be sent", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(400)
+            .query({ p: "not_a_valid_page" })
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Query Value");
+            });
+    });
     test("POST:201 Should add an article to the database and send the new article", () => {
         return request(app)
             .post("/api/articles")

@@ -19,15 +19,17 @@ exports.selectArticles = (
         "comment_count",
     ];
 
-    if (
-        !validOrders.includes(upperCaseOrder) ||
-        !validSortBys.includes(sort_by)
-    ) {
-        return Promise.reject({ status: 400, msg: "Invalid Query Value" });
-    }
-
     if (page && limit === undefined) {
         limit = 10;
+    }
+
+    if (
+        !validOrders.includes(upperCaseOrder) ||
+        !validSortBys.includes(sort_by) ||
+        (limit && Number.isNaN(Number(limit))) ||
+        (page && Number.isNaN(Number(page)))
+    ) {
+        return Promise.reject({ status: 400, msg: "Invalid Query Value" });
     }
 
     const sqlArray = [];
@@ -56,7 +58,7 @@ exports.selectArticles = (
     GROUP BY articles.article_id
     ORDER BY ${sort_by} ${upperCaseOrder}`;
 
-    if (limit || page) {
+    if (limit) {
         sqlString += `
     LIMIT $${insertPosition++}`;
         sqlArray.push(limit);
