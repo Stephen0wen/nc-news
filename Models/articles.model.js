@@ -78,6 +78,23 @@ exports.selectArticles = (
     });
 };
 
+exports.totalCount = (topic) => {
+    const sqlArray = [];
+    let sqlString = `
+    SELECT COUNT(article_id)::INT AS total_count
+    FROM articles`;
+
+    if (topic) {
+        sqlString += `
+    WHERE topic = $1`;
+        sqlArray.push(topic);
+    }
+
+    return db.query(sqlString, sqlArray).then(({ rows }) => {
+        return rows[0];
+    });
+};
+
 exports.insertArticle = (author, title, body, topic, article_img_url) => {
     const created_at = new Date();
     if (!article_img_url) {

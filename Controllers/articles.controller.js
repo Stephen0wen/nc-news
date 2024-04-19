@@ -1,5 +1,6 @@
 const {
     selectArticles,
+    totalCount,
     insertArticle,
     selectArticle,
     updateArticle,
@@ -10,15 +11,18 @@ const { selectTopic } = require("../Models/topics.model");
 
 exports.getArticles = (request, response, next) => {
     const { topic, order, sort_by, limit, p } = request.query;
-    const promises = [selectArticles(topic, order, sort_by, limit, p)];
+    const promises = [
+        selectArticles(topic, order, sort_by, limit, p),
+        totalCount(topic),
+    ];
 
     if (topic) {
         promises.push(selectTopic(topic));
     }
 
     return Promise.all(promises)
-        .then(([articles]) => {
-            response.status(200).send({ articles });
+        .then(([articles, { total_count }]) => {
+            response.status(200).send({ articles, total_count });
         })
         .catch((error) => {
             next(error);

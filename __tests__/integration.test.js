@@ -219,6 +219,19 @@ describe("/api/articles", () => {
                 });
             });
     });
+    test("GET:200 Should respond with a total count of the number of articles (post filtering) on a separate key from the articles", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .query({
+                p: 2,
+                limit: 5,
+                topic: "mitch",
+            })
+            .then((response) => {
+                expect(response.body.total_count).toBe(12);
+            });
+    });
     test("GET:400 Invalid sort_by query values should cause an error to be sent", () => {
         return request(app)
             .get("/api/articles")
