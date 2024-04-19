@@ -65,8 +65,9 @@ exports.patchArticle = (request, response, next) => {
 
 exports.getCommentsByArticle = (request, response, next) => {
     const { article_id } = request.params;
+    const { limit, p } = request.query;
     return Promise.all([
-        selectCommentsByArticle(article_id),
+        selectCommentsByArticle(article_id, limit, p),
         selectArticle(article_id),
     ])
         .then(([comments]) => {
