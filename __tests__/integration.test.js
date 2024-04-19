@@ -40,7 +40,7 @@ describe("/api/topics", () => {
                 });
             });
     });
-    test.only("POST:201 Should post a new topic and return the new topic in an object", () => {
+    test("POST:201 Should post a new topic and return the new topic in an object", () => {
         return request(app)
             .post("/api/topics")
             .send({
@@ -54,6 +54,18 @@ describe("/api/topics", () => {
                 expect(topic.description).toBe(
                     "A place for articles about aquatic creatures"
                 );
+            });
+    });
+    test("POST:400 Invalid request body should cause an error", () => {
+        return request(app)
+            .post("/api/topics")
+            .send({
+                snail: "fish",
+                description: "A place for articles about aquatic creatures",
+            })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request Body");
             });
     });
 });
