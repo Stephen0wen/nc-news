@@ -478,6 +478,65 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(comments).toEqual([]);
             });
     });
+    test("GET:200 Should accept a 'limit' query, which causes only the specified number of articles to be sent", () => {
+        return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .query({ limit: 5 })
+            .then((response) => {
+                const { comments } = response.body;
+                expect(comments.length).toBe(5);
+            });
+    });
+    test("GET:200 Should accept a 'p' (page) query, which works alongside the limit query to enable pagination", () => {
+        return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .query({
+                limit: 5,
+                p: 2,
+            })
+            .then((response) => {
+                const { comments } = response.body;
+                expect(comments.length).toBe(5);
+                const comment_ids = [8, 6, 12, 3, 4];
+                comments.forEach((comment) => {
+                    expect(comment_ids.includes(comment.comment_id)).toBe(true);
+                });
+            });
+    });
+    test("GET:200 If a 'p' (page) query is given with no limit, the limit will default to 10", () => {
+        return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .query({
+                p: 1,
+            })
+            .then((response) => {
+                const { comments } = response.body;
+                expect(comments.length).toBe(10);
+            });
+    });
+    //New Tests
+    test("GET:400 Invalid limit query values should cause an error to be sent", () => {
+        return request(app)
+            .get("/api/articles/1/comments")
+            .expect(400)
+            .query({ limit: "not_a_valid_limit" })
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Query Value");
+            });
+    });
+    test("GET:400 Invalid page query should cause an error to be sent", () => {
+        return request(app)
+            .get("/api/articles/1/comments")
+            .expect(400)
+            .query({ p: "not_a_valid_page" })
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Query Value");
+            });
+    });
+    //End of new Tests
     test("GET:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
         return request(app)
             .get("/api/articles/9999/comments")

@@ -171,19 +171,41 @@ exports.updateArticle = (article_id, inc_votes) => {
         });
 };
 
-exports.selectCommentsByArticle = (article_id) => {
-    return db
-        .query(
-            `
-            SELECT comment_id, votes, created_at, author, body, article_id
-            FROM comments
-            Where article_id = $1
-            ORDER BY created_at DESC`,
-            [article_id]
-        )
-        .then(({ rows }) => {
-            return rows;
-        });
+exports.selectCommentsByArticle = (article_id, limit, page) => {
+    if (page && !limit) {
+        limit = 10;
+    }
+
+    if (
+        (limit && Number.isNaN(Number(limit))) ||
+        (page && Number.isNaN(Number(page)))
+    ) {
+        return Promise.reject({ status: 400, msg: "Invalid Query Value" });
+    }
+
+    const sqlArray = [article_id];
+    let sqlString = `
+    SELECT comment_id, votes, created_at, author, body, article_id
+    FROM comments
+    WHERE article_id = $1
+    ORDER BY created_at DESC`;
+
+    if (limit) {
+        sqlString += `
+    LIMIT $2`;
+        sqlArray.push(limit);
+    }
+
+    if (page) {
+        const offset = (page - 1) * limit;
+        sqlString += `
+    OFFSET $3`;
+        sqlArray.push(offset);
+    }
+
+    return db.query(sqlString, sqlArray).then(({ rows }) => {
+        return rows;
+    });
 };
 
 exports.insertCommentByArticle = (article_id, username, body) => {
