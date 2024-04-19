@@ -40,6 +40,22 @@ describe("/api/topics", () => {
                 });
             });
     });
+    test.only("POST:201 Should post a new topic and return the new topic in an object", () => {
+        return request(app)
+            .post("/api/topics")
+            .send({
+                slug: "fish",
+                description: "A place for articles about aquatic creatures",
+            })
+            .expect(201)
+            .then((response) => {
+                const { topic } = response.body;
+                expect(topic.slug).toBe("fish");
+                expect(topic.description).toBe(
+                    "A place for articles about aquatic creatures"
+                );
+            });
+    });
 });
 
 describe("/api/articles", () => {
@@ -517,7 +533,6 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(comments.length).toBe(10);
             });
     });
-    //New Tests
     test("GET:400 Invalid limit query values should cause an error to be sent", () => {
         return request(app)
             .get("/api/articles/1/comments")
@@ -536,7 +551,6 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(response.body.msg).toBe("Invalid Query Value");
             });
     });
-    //End of new Tests
     test("GET:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
         return request(app)
             .get("/api/articles/9999/comments")
