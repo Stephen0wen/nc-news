@@ -66,9 +66,13 @@ exports.patchArticle = (request, response, next) => {
 
 exports.deleteArticle = (request, response, next) => {
     const { article_id } = request.params;
-    dbDeleteArticle(article_id).then(() => {
-        response.status(204).send({});
-    });
+    dbDeleteArticle(article_id)
+        .then(() => {
+            response.status(204).send({});
+        })
+        .catch((error) => {
+            next(error);
+        });
 };
 
 exports.getCommentsByArticle = (request, response, next) => {

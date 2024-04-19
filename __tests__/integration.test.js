@@ -474,6 +474,22 @@ describe("/api/articles/:article_id", () => {
                 expect(response.body).toEqual({});
             });
     });
+    test("GET:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
+        return request(app)
+            .delete("/api/articles/9999")
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("Article not found");
+            });
+    });
+    test("GET:400 If an invalid id is given, an error message should be sent", () => {
+        return request(app)
+            .delete("/api/articles/string")
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe("Invalid Request");
+            });
+    });
 });
 
 describe("/api/articles/:article_id/comments", () => {
