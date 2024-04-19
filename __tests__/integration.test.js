@@ -466,6 +466,14 @@ describe("/api/articles/:article_id", () => {
                 expect(response.body.msg).toBe("Invalid Request Body");
             });
     });
+    test("DELETE:204 Should delete an article along with all associated comments and send no content", () => {
+        return request(app)
+            .delete("/api/articles/1")
+            .expect(204)
+            .then((response) => {
+                expect(response.body).toEqual({});
+            });
+    });
 });
 
 describe("/api/articles/:article_id/comments", () => {

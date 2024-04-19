@@ -4,6 +4,7 @@ const {
     insertArticle,
     selectArticle,
     updateArticle,
+    dbDeleteArticle,
     selectCommentsByArticle,
     insertCommentByArticle,
 } = require("../Models/articles.model");
@@ -61,6 +62,13 @@ exports.patchArticle = (request, response, next) => {
         .catch((error) => {
             next(error);
         });
+};
+
+exports.deleteArticle = (request, response, next) => {
+    const { article_id } = request.params;
+    dbDeleteArticle(article_id).then(() => {
+        response.status(204).send({});
+    });
 };
 
 exports.getCommentsByArticle = (request, response, next) => {

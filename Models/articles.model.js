@@ -171,6 +171,24 @@ exports.updateArticle = (article_id, inc_votes) => {
         });
 };
 
+exports.dbDeleteArticle = (article_id) => {
+    return db
+        .query(
+            `
+    DELETE FROM comments
+    WHERE article_id = $1;`,
+            [article_id]
+        )
+        .then(() => {
+            return db.query(
+                `
+    DELETE FROM articles
+    WHERE article_id = $1;`,
+                [article_id]
+            );
+        });
+};
+
 exports.selectCommentsByArticle = (article_id, limit, page) => {
     if (page && !limit) {
         limit = 10;
