@@ -354,6 +354,20 @@ describe("/api/articles", () => {
                 expect(response.body.msg).toBe("Invalid Request Body");
             });
     });
+    test("POST:404 Request body with correct keys, but with an author which is invalid or doesn't exist", () => {
+        return request(app)
+            .post("/api/articles")
+            .send({
+                author: { username: "person1" },
+                title: "An article about paper",
+                body: "A very long discussion about paper",
+                topic: "paper",
+            })
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe("User not found");
+            });
+    });
 });
 
 describe("/api/articles/:article_id", () => {
