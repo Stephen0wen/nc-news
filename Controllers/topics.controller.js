@@ -1,4 +1,8 @@
-const { selectTopics, insertTopic } = require("../Models/topics.model");
+const {
+    selectTopics,
+    insertTopic,
+    dbDeleteTopic,
+} = require("../Models/topics.model");
 
 exports.getTopics = (request, response, next) => {
     selectTopics().then((topics) => {
@@ -15,4 +19,11 @@ exports.postTopic = (request, response, next) => {
         .catch((error) => {
             next(error);
         });
+};
+
+exports.deleteTopic = (request, response, next) => {
+    const { slug } = request.params;
+    dbDeleteTopic(slug).then(() => {
+        response.status(204).send({});
+    });
 };
