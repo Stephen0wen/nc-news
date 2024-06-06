@@ -44,3 +44,46 @@ exports.insertTopic = (slug, description) => {
             return rows[0];
         });
 };
+
+exports.dbDeleteTopic = (slug) => {
+    return db
+        .query(
+            `
+        SELECT article_id
+        FROM articles
+        WHERE topic = $1;
+        `,
+            [slug]
+        )
+        .then(({ rows }) => {
+            const article_ids = rows.map(({ article_id }) => {
+                return article_id;
+            });
+            return db.query(
+                `
+        DELETE FROM comments
+        WHERE article_id IN (${article_ids.join(",")})
+                `
+            );
+        })
+        .then(() => {
+            return db.query(
+                `
+        DELETE FROM articles
+        WHERE topic = $1
+        RETURNING *;
+                `,
+                [slug]
+            );
+        })
+        .then(() => {
+            return db.query(
+                `
+        DELETE FROM topics
+        WHERE slug = $1
+        RETURNING *;        
+                `,
+                [slug]
+            );
+        });
+};

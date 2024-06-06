@@ -23,6 +23,11 @@
             }
         }
     },
+    "DELETE /api/topics/:slug": {
+        "description": "removes a topic and all associated content from the database and serves an empty object",
+        "queries": [],
+        "exampleResponse": {}
+    },
     "GET /api/articles": {
         "description": "serves an array of all articles",
         "queries": ["topic", "sort_by", "order", "limit", "p"],

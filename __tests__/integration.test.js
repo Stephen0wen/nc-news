@@ -68,6 +68,14 @@ describe("/api/topics", () => {
                 expect(response.body.msg).toBe("Invalid Request Body");
             });
     });
+    test("DELETE:204 Should delete a topic along with all associated articles and comments while sending no content", () => {
+        return request(app)
+            .delete("/api/topics/mitch")
+            .expect(204)
+            .then((response) => {
+                expect(response.body).toEqual({});
+            });
+    });
 });
 
 describe("/api/articles", () => {
