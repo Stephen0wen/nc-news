@@ -23,7 +23,11 @@ exports.postTopic = (request, response, next) => {
 
 exports.deleteTopic = (request, response, next) => {
     const { slug } = request.params;
-    dbDeleteTopic(slug).then(() => {
-        response.status(204).send({});
-    });
+    dbDeleteTopic(slug)
+        .then(() => {
+            response.status(204).send({});
+        })
+        .catch((error) => {
+            next(error);
+        });
 };

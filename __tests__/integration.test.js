@@ -33,7 +33,7 @@ describe("/api/topics", () => {
             .expect(200)
             .then((response) => {
                 const topics = response.body.topics;
-                expect(topics.length).toBe(3);
+                expect(topics.length).toBe(4);
                 topics.forEach((topic) => {
                     expect(typeof topic.slug).toBe("string");
                     expect(typeof topic.description).toBe("string");
@@ -76,6 +76,22 @@ describe("/api/topics", () => {
                 expect(response.body).toEqual({});
             });
     });
+    test("DELETE:204 Should delete a topic along with all associated articles and comments while sending no content", () => {
+        return request(app)
+            .delete("/api/topics/Cats")
+            .expect(204)
+            .then((response) => {
+                expect(response.body).toEqual({});
+            });
+    });
+    test("DELETE:204 Should delete a topic with no associated articles", () => {
+        return request(app)
+            .delete("/api/topics/Music")
+            .expect(204)
+            .then((response) => {
+                expect(response.body).toEqual({});
+            });
+    });
 });
 
 describe("/api/articles", () => {
@@ -113,7 +129,7 @@ describe("/api/articles", () => {
     test("GET:200 Should accept a topic query, which filters the response to only include articles with the given topic", () => {
         return request(app)
             .get("/api/articles")
-            .query({ topic: "cats" })
+            .query({ topic: "Cats" })
             .expect(200)
             .then((response) => {
                 const articles = response.body.articles;
@@ -121,7 +137,7 @@ describe("/api/articles", () => {
                 expect(articles[0].title).toBe(
                     "UNCOVERED: catspiracy to bring down democracy"
                 );
-                expect(articles[0].topic).toBe("cats");
+                expect(articles[0].topic).toBe("Cats");
                 expect(articles[0].author).toBe("rogersop");
                 expect(typeof articles[0].created_at).toBe("string");
                 expect(articles[0].article_img_url).toBe(

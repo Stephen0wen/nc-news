@@ -56,15 +56,17 @@ exports.dbDeleteTopic = (slug) => {
             [slug]
         )
         .then(({ rows }) => {
-            const article_ids = rows.map(({ article_id }) => {
-                return article_id;
-            });
-            return db.query(
-                `
+            if (rows.length) {
+                const article_ids = rows.map(({ article_id }) => {
+                    return article_id;
+                });
+                return db.query(
+                    `
         DELETE FROM comments
         WHERE article_id IN (${article_ids.join(",")})
                 `
-            );
+                );
+            }
         })
         .then(() => {
             return db.query(
