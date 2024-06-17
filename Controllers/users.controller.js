@@ -1,9 +1,17 @@
+const { authenticate } = require("../Auth/authenticate");
 const { selectUsers, selectUser } = require("../Models/users.model");
 
 exports.getUsers = (request, response, next) => {
-    selectUsers().then((users) => {
-        response.status(200).send({ users });
-    });
+    authenticate(request)
+        .then(() => {
+            return selectUsers();
+        })
+        .then((users) => {
+            response.status(200).send({ users });
+        })
+        .catch((error) => {
+            next(error);
+        });
 };
 
 exports.getUser = (request, response, next) => {

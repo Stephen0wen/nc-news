@@ -7,6 +7,8 @@ const { describe, test } = require("@jest/globals");
 const endpoints = require("../endpoints.json");
 const { response } = require("express");
 
+const authHeader = require(`${__dirname}/../.env.test.token.json`);
+
 beforeEach(() => {
     return seed(data);
 });
@@ -785,6 +787,7 @@ describe("/api/users", () => {
     test("GET:200 Should send an array of all users", () => {
         return request(app)
             .get("/api/users")
+            .set(authHeader)
             .expect(200)
             .then((response) => {
                 const users = response.body.users;
