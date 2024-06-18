@@ -325,8 +325,8 @@ describe("/api/articles", () => {
     test("POST:201 Should add an article to the database and send the new article", () => {
         return request(app)
             .post("/api/articles")
+            .set(authHeader)
             .send({
-                author: "icellusedkars",
                 title: "An article about paper",
                 body: "A very long discussion about paper",
                 topic: "paper",
@@ -336,7 +336,7 @@ describe("/api/articles", () => {
             .expect(201)
             .then((response) => {
                 const { article } = response.body;
-                expect(article.author).toBe("icellusedkars");
+                expect(article.author_id).toBe(1);
                 expect(article.title).toBe("An article about paper");
                 expect(article.article_id).toBe(14);
                 expect(article.body).toBe("A very long discussion about paper");
@@ -352,8 +352,8 @@ describe("/api/articles", () => {
     test("POST:201 Should add a default image url if none is given in the request body", () => {
         return request(app)
             .post("/api/articles")
+            .set(authHeader)
             .send({
-                author: "icellusedkars",
                 title: "An article about paper",
                 body: "A very long discussion about paper",
                 topic: "paper",
@@ -369,8 +369,8 @@ describe("/api/articles", () => {
     test("POST:400 Invalid request body should cause an error", () => {
         return request(app)
             .post("/api/articles")
+            .set(authHeader)
             .send({
-                author: "icellusedkars",
                 title: "An article about paper",
                 notBody: "A very long discussion about paper",
                 topic: "paper",
@@ -380,18 +380,17 @@ describe("/api/articles", () => {
                 expect(response.body.msg).toBe("Invalid Request Body");
             });
     });
-    test("POST:404 Request body with correct keys, but with an author which is invalid or doesn't exist", () => {
+    test("POST:403 Request body with correct keys, but with no auth header", () => {
         return request(app)
             .post("/api/articles")
             .send({
-                author: { username: "person1" },
                 title: "An article about paper",
                 body: "A very long discussion about paper",
                 topic: "paper",
             })
-            .expect(404)
+            .expect(403)
             .then((response) => {
-                expect(response.body.msg).toBe("User not found");
+                expect(response.body.msg).toBe("No Authentication Token");
             });
     });
 });
@@ -465,7 +464,7 @@ describe("/api/articles/:article_id", () => {
             .then((response) => {
                 const article = response.body.article;
                 expect(Object.keys(article).length).toBe(8);
-                expect(article.author).toBe("butter_bridge");
+                expect(article.author_id).toBe(1);
                 expect(article.title).toBe(
                     "Living in the shadow of a great man"
                 );
@@ -509,22 +508,42 @@ describe("/api/articles/:article_id", () => {
     test("DELETE:204 Should delete an article along with all associated comments and send no content", () => {
         return request(app)
             .delete("/api/articles/1")
+            .set(authHeader)
             .expect(204)
             .then((response) => {
                 expect(response.body).toEqual({});
             });
     });
-    test("GET:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
+    test("DELETE:403 Should send an error if the user does not provide a token", () => {
+        return request(app)
+            .delete("/api/articles/1")
+            .expect(403)
+            .then((response) => {
+                expect(response.body.msg).toBe("No Authentication Token");
+            });
+    });
+    test("DELETE:403 Should send an error if the user is not allowed to delete the article", () => {
+        return request(app)
+            .delete("/api/articles/2")
+            .set(authHeader)
+            .expect(403)
+            .then((response) => {
+                expect(response.body.msg).toBe("Authentication Failed");
+            });
+    });
+    test("DELETE:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
         return request(app)
             .delete("/api/articles/9999")
+            .set(authHeader)
             .expect(404)
             .then((response) => {
                 expect(response.body.msg).toBe("Article not found");
             });
     });
-    test("GET:400 If an invalid id is given, an error message should be sent", () => {
+    test("DELETE:400 If an invalid id is given, an error message should be sent", () => {
         return request(app)
             .delete("/api/articles/string")
+            .set(authHeader)
             .expect(400)
             .then((response) => {
                 expect(response.body.msg).toBe("Invalid Request");
@@ -646,8 +665,8 @@ describe("/api/articles/:article_id/comments", () => {
     test("POST:201 Should insert the new comment into the database and send the object back to the client", () => {
         return request(app)
             .post("/api/articles/2/comments")
+            .set(authHeader)
             .send({
-                username: "rogersop",
                 body: "This is a test comment...",
             })
             .expect(201)
@@ -657,7 +676,7 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(comment.comment_id).toBe(19);
                 expect(comment.votes).toBe(0);
                 expect(typeof comment.created_at).toBe("string");
-                expect(comment.author).toBe("rogersop");
+                expect(comment.author_id).toBe(1);
                 expect(comment.body).toBe("This is a test comment...");
                 expect(comment.article_id).toBe(2);
             });
@@ -665,6 +684,7 @@ describe("/api/articles/:article_id/comments", () => {
     test("POST:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
         return request(app)
             .post("/api/articles/9999/comments")
+            .set(authHeader)
             .send({
                 username: "rogersop",
                 body: "This is a test comment...",
@@ -677,6 +697,7 @@ describe("/api/articles/:article_id/comments", () => {
     test("POST:400 If an invalid id is given, an error message should be sent", () => {
         return request(app)
             .post("/api/articles/dodgyID/comments")
+            .set(authHeader)
             .send({
                 username: "rogersop",
                 body: "This is a test comment...",
@@ -689,6 +710,7 @@ describe("/api/articles/:article_id/comments", () => {
     test("POST:400 If an invalid request body is given, an error message should be sent", () => {
         return request(app)
             .post("/api/articles/2/comments")
+            .set(authHeader)
             .send({
                 username: "rogersop",
                 notBody: "This is not a comment...",
@@ -698,16 +720,15 @@ describe("/api/articles/:article_id/comments", () => {
                 expect(response.body.msg).toBe("Invalid Request Body");
             });
     });
-    test("POST:404 If a valid request body is given, but the username is not in the database, an error message should be sent", () => {
+    test("POST:404 If no valid auth token is given, an error should be sent", () => {
         return request(app)
             .post("/api/articles/2/comments")
             .send({
-                username: "clandestine_user",
                 body: "This is a test comment",
             })
-            .expect(404)
+            .expect(403)
             .then((response) => {
-                expect(response.body.msg).toBe("User not found");
+                expect(response.body.msg).toBe("No Authentication Token");
             });
     });
 });
@@ -725,7 +746,7 @@ describe("/api/comments/:comment_id", () => {
                     "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works."
                 );
                 expect(comment.votes).toBe(105);
-                expect(comment.author).toBe("icellusedkars");
+                expect(comment.author_id).toBe(2);
                 expect(comment.article_id).toBe(1);
                 expect(typeof comment.created_at).toBe("string");
             });
@@ -759,7 +780,8 @@ describe("/api/comments/:comment_id", () => {
     });
     test("DELETE:200 Should delete the comment from the database and send it back to the client", () => {
         return request(app)
-            .delete("/api/comments/5")
+            .delete("/api/comments/1")
+            .set(authHeader)
             .expect(204)
             .then((response) => {
                 expect(response.body).toEqual({});
@@ -768,17 +790,36 @@ describe("/api/comments/:comment_id", () => {
     test("DELETE:404 If a valid id is given, but it does not exist in the database, an error message should be sent", () => {
         return request(app)
             .delete("/api/comments/9999")
+            .set(authHeader)
             .expect(404)
             .then((response) => {
                 expect(response.body.msg).toBe("Comment not found");
             });
     });
-    test("DELETE 400 If an invalid id is given, an error message should be sent", () => {
+    test("DELETE:400 If an invalid id is given, an error message should be sent", () => {
         return request(app)
             .delete("/api/comments/wrong_format")
+            .set(authHeader)
             .expect(400)
             .then((response) => {
                 expect(response.body.msg).toBe("Invalid Request");
+            });
+    });
+    test("DELETE:403 If no auth token is given, an error message should be sent", () => {
+        return request(app)
+            .delete("/api/comments/1")
+            .expect(403)
+            .then((response) => {
+                expect(response.body.msg).toBe("No Authentication Token");
+            });
+    });
+    test("DELETE:403 If the user is not allowed to delete the comment, an error message should be sent", () => {
+        return request(app)
+            .delete("/api/comments/3")
+            .set(authHeader)
+            .expect(403)
+            .then((response) => {
+                expect(response.body.msg).toBe("Authentication Failed");
             });
     });
 });
@@ -793,10 +834,12 @@ describe("/api/users", () => {
                 const users = response.body.users;
                 expect(users.length).toBe(4);
                 users.forEach((user) => {
-                    expect(Object.keys(user).length).toBe(3);
+                    expect(Object.keys(user).length).toBe(5);
+                    expect(typeof user.user_id).toBe("number");
                     expect(typeof user.username).toBe("string");
                     expect(typeof user.name).toBe("string");
                     expect(typeof user.avatar_url).toBe("string");
+                    expect(typeof user.uuid).toBe("string");
                 });
             });
     });

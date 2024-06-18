@@ -1,3 +1,4 @@
+const { authenticate } = require("../Auth/authenticate");
 const {
     selectArticles,
     totalCount,
@@ -31,8 +32,12 @@ exports.getArticles = (request, response, next) => {
 };
 
 exports.postArticle = (request, response, next) => {
-    const { author, title, body, topic, article_img_url } = request.body;
-    insertArticle(author, title, body, topic, article_img_url)
+    const { title, body, topic, article_img_url } = request.body;
+
+    authenticate(request)
+        .then(({ uid }) => {
+            return insertArticle(uid, title, body, topic, article_img_url);
+        })
         .then((article) => {
             response.status(201).send({ article });
         })
@@ -66,7 +71,10 @@ exports.patchArticle = (request, response, next) => {
 
 exports.deleteArticle = (request, response, next) => {
     const { article_id } = request.params;
-    dbDeleteArticle(article_id)
+    authenticate(request)
+        .then(({ uid }) => {
+            return dbDeleteArticle(uid, article_id);
+        })
         .then(() => {
             response.status(204).send({});
         })
@@ -92,8 +100,12 @@ exports.getCommentsByArticle = (request, response, next) => {
 
 exports.postCommentByArticle = (request, response, next) => {
     const { article_id } = request.params;
-    const { username, body } = request.body;
-    insertCommentByArticle(article_id, username, body)
+    const { body } = request.body;
+
+    authenticate(request)
+        .then(({ uid }) => {
+            return insertCommentByArticle(article_id, uid, body);
+        })
         .then((comment) => {
             response.status(201).send({ comment });
         })
