@@ -45,6 +45,7 @@ describe("/api/topics", () => {
     test("POST:201 Should post a new topic and return the new topic in an object", () => {
         return request(app)
             .post("/api/topics")
+            .set(authHeader)
             .send({
                 slug: "fish",
                 description: "A place for articles about aquatic creatures",
@@ -61,6 +62,7 @@ describe("/api/topics", () => {
     test("POST:400 Invalid request body should cause an error", () => {
         return request(app)
             .post("/api/topics")
+            .set(authHeader)
             .send({
                 snail: "fish",
                 description: "A place for articles about aquatic creatures",
@@ -68,6 +70,14 @@ describe("/api/topics", () => {
             .expect(400)
             .then((response) => {
                 expect(response.body.msg).toBe("Invalid Request Body");
+            });
+    });
+    test("POST:403 If no auth header is provided, an error should be sent", () => {
+        return request(app)
+            .post("/api/topics")
+            .expect(403)
+            .then((response) => {
+                expect(response.body.msg).toBe("No Authentication Token");
             });
     });
     test("DELETE:204 Should delete a topic along with all associated articles and comments while sending no content", () => {

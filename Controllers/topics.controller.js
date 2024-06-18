@@ -1,3 +1,4 @@
+const { authenticate } = require("../Auth/authenticate");
 const {
     selectTopics,
     insertTopic,
@@ -12,7 +13,10 @@ exports.getTopics = (request, response, next) => {
 
 exports.postTopic = (request, response, next) => {
     const { slug, description } = request.body;
-    insertTopic(slug, description)
+    authenticate(request)
+        .then(() => {
+            return insertTopic(slug, description);
+        })
         .then((topic) => {
             response.status(201).send({ topic });
         })
