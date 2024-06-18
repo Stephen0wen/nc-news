@@ -4,6 +4,7 @@ const {
     handleInvalidPath,
     handleCustomErrors,
     handlePsqlErrors,
+    handleAuthErrors,
 } = require("./Errors");
 const cors = require("cors");
 
@@ -18,5 +19,7 @@ app.use(handleInvalidPath);
 app.use(handleCustomErrors);
 
 app.use(handlePsqlErrors);
+
+app.use(handleAuthErrors);
 
 module.exports = app;

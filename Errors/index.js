@@ -35,3 +35,9 @@ exports.handlePsqlErrors = (error, request, response, next) => {
 
     next(error);
 };
+
+exports.handleAuthErrors = (error, request, response, next) => {
+    if (error.code === "auth/argument-error") {
+        response.status(403).send({ msg: "Authentication Failed" });
+    }
+};

@@ -36,7 +36,7 @@ exports.selectArticles = (
     let insertPosition = 1;
     let sqlString = `
     SELECT
-        articles.author,
+        users.username AS author,
         articles.title,
         articles.article_id,
         articles.topic,
@@ -45,6 +45,8 @@ exports.selectArticles = (
         articles.article_img_url,
         COUNT(comment_id)::INT AS comment_count
     FROM articles
+    INNER JOIN users
+    ON articles.author_id = users.user_id
     LEFT JOIN comments
     ON comments.article_id = articles.article_id`;
 
@@ -55,7 +57,9 @@ exports.selectArticles = (
     }
 
     sqlString += `
-    GROUP BY articles.article_id
+    GROUP BY
+        articles.article_id,
+        author
     ORDER BY ${sort_by} ${upperCaseOrder}`;
 
     if (limit) {
@@ -70,8 +74,6 @@ exports.selectArticles = (
     OFFSET $${insertPosition++}`;
         sqlArray.push(offset);
     }
-
-    sqlString += `;`;
 
     return db.query(sqlString, sqlArray).then(({ rows }) => {
         return rows;
@@ -95,22 +97,45 @@ exports.totalCount = (topic) => {
     });
 };
 
-exports.insertArticle = (author, title, body, topic, article_img_url) => {
-    const created_at = new Date();
-    if (!article_img_url) {
-        article_img_url =
-            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700";
-    }
+exports.insertArticle = (uid, title, body, topic, article_img_url) => {
     return db
         .query(
             `
+    SELECT user_id
+    FROM users
+    WHERE uuid = $1    
+        `,
+            [uid]
+        )
+        .then(({ rows }) => {
+            if (rows.length === 0) {
+                return Promise.reject({
+                    status: 404,
+                    msg: "Author not found",
+                });
+            }
+
+            const { user_id } = rows[0];
+            return user_id;
+        })
+        .then((user_id) => {
+            const created_at = new Date();
+            if (!article_img_url) {
+                article_img_url =
+                    "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700";
+            }
+
+            return db.query(
+                `
     INSERT INTO articles
-        (author, title, body, topic, article_img_url, created_at)
+        (author_id, title, body, topic, article_img_url, created_at)
     VALUES
         ($1, $2, $3, $4, $5, $6)
     RETURNING *`,
-            [author, title, body, topic, article_img_url, created_at]
-        )
+                [user_id, title, body, topic, article_img_url, created_at]
+            );
+        })
+
         .then(({ rows }) => {
             rows[0].comment_count = 0;
             return rows[0];
@@ -122,7 +147,7 @@ exports.selectArticle = (article_id) => {
         .query(
             `
     SELECT 
-        articles.author,
+        users.username AS author,
         articles.title,
         articles.article_id,
         articles.body,
@@ -132,10 +157,14 @@ exports.selectArticle = (article_id) => {
         articles.article_img_url,
         COUNT(comment_id)::int AS comment_count 
     FROM articles
+    INNER JOIN users
+    ON articles.author_id = users.user_id
     LEFT JOIN comments
     ON comments.article_id = articles.article_id
     WHERE articles.article_id = $1
-    GROUP BY articles.article_id;`,
+    GROUP BY 
+        articles.article_id,
+        author;`,
             [article_id]
         )
         .then(({ rows }) => {
@@ -171,14 +200,39 @@ exports.updateArticle = (article_id, inc_votes) => {
         });
 };
 
-exports.dbDeleteArticle = (article_id) => {
+exports.dbDeleteArticle = (uid, article_id) => {
     return db
         .query(
             `
-    DELETE FROM comments
-    WHERE article_id = $1;`,
+    SELECT *
+    FROM articles
+    INNER JOIN users
+    ON articles.author_id = users.user_id
+    WHERE 
+        article_id = $1   
+        `,
             [article_id]
         )
+        .then(({ rows }) => {
+            if (rows.length === 0) {
+                return Promise.reject({
+                    status: 404,
+                    msg: "Article not found",
+                });
+            }
+            if (rows[0].uuid !== uid) {
+                return Promise.reject({
+                    status: 403,
+                    msg: "Authentication Failed",
+                });
+            }
+            return db.query(
+                `
+    DELETE FROM comments
+    WHERE article_id = $1;`,
+                [article_id]
+            );
+        })
         .then(() => {
             return db.query(
                 `
@@ -212,9 +266,17 @@ exports.selectCommentsByArticle = (article_id, limit, page) => {
 
     const sqlArray = [article_id];
     let sqlString = `
-    SELECT comment_id, votes, created_at, author, body, article_id
+    SELECT 
+        comment_id,
+        votes, 
+        created_at, 
+        users.username AS author, 
+        body, 
+        article_id
     FROM comments
-    WHERE article_id = $1
+    INNER JOIN users
+    ON comments.author_id = users.user_id
+    WHERE article_id = $1 
     ORDER BY created_at DESC`;
 
     if (limit) {
@@ -235,18 +297,41 @@ exports.selectCommentsByArticle = (article_id, limit, page) => {
     });
 };
 
-exports.insertCommentByArticle = (article_id, username, body) => {
-    const created_at = new Date();
+exports.insertCommentByArticle = (article_id, uid, body) => {
     return db
         .query(
             `
+    SELECT user_id
+    FROM users
+    WHERE uuid = $1    
+        `,
+            [uid]
+        )
+        .then(({ rows }) => {
+            if (rows.length === 0) {
+                return Promise.reject({
+                    status: 404,
+                    msg: "Author not found",
+                });
+            }
+
+            const { user_id } = rows[0];
+            return user_id;
+        })
+        .then((user_id) => {
+            const created_at = new Date();
+
+            return db.query(
+                `
     INSERT INTO comments
-        (article_id, author, body, created_at)
+        (article_id, author_id, body, created_at)
     VALUES
         ($1, $2, $3, $4)
     RETURNING *`,
-            [article_id, username, body, created_at]
-        )
+                [article_id, user_id, body, created_at]
+            );
+        })
+
         .then(({ rows }) => {
             return rows[0];
         });

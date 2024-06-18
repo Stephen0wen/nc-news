@@ -1,3 +1,4 @@
+const { authenticate } = require("../Auth/authenticate");
 const { updateComment, dbDeleteComment } = require("../Models/comments.model");
 
 exports.patchComment = (request, response, next) => {
@@ -14,7 +15,11 @@ exports.patchComment = (request, response, next) => {
 
 exports.deleteComment = (request, response, next) => {
     const { comment_id } = request.params;
-    return dbDeleteComment(comment_id)
+
+    authenticate(request)
+        .then(({ uid }) => {
+            return dbDeleteComment(comment_id, uid);
+        })
         .then(() => {
             response.status(204).send();
         })
