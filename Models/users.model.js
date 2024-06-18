@@ -12,14 +12,14 @@ exports.selectUsers = () => {
         });
 };
 
-exports.selectUser = (username) => {
+exports.selectUser = (uuid) => {
     return db
         .query(
             `
     SELECT *
     FROM users
-    WHERE username = $1;`,
-            [username]
+    WHERE uuid = $1;`,
+            [uuid]
         )
         .then(({ rows }) => {
             if (rows.length === 0) {

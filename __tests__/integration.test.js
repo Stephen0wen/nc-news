@@ -848,23 +848,33 @@ describe("/api/users", () => {
 describe("/api/users/:username", () => {
     test("GET:200 Should send the requested user object on a key of user", () => {
         return request(app)
-            .get("/api/users/lurker")
+            .get("/api/users/2fl6HBpP09WOVoUTXXdMMuzdXLD3")
+            .set(authHeader)
             .expect(200)
             .then((response) => {
                 const { user } = response.body;
-                expect(user.username).toBe("lurker");
-                expect(user.name).toBe("do_nothing");
+                expect(user.username).toBe("butter_bridge");
+                expect(user.name).toBe("jonny");
                 expect(user.avatar_url).toBe(
-                    "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+                    "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
                 );
             });
     });
-    test("GET:404 If the requested username is not in the database, an error should be sent", () => {
+    test("GET:403 If the uuid in the URL does not match the decoded JWT, an error should be sent", () => {
         return request(app)
-            .get("/api/users/waldo")
-            .expect(404)
+            .get("/api/users/2fl6HBpP09WOVoUTXXdMMuzdXLD5")
+            .set(authHeader)
+            .expect(403)
             .then((response) => {
-                expect(response.body.msg).toBe("User not found");
+                expect(response.body.msg).toBe("Authentication Failed");
+            });
+    });
+    test("GET:403 If no auth header is given, an error should be sent", () => {
+        return request(app)
+            .get("/api/users/2fl6HBpP09WOVoUTXXdMMuzdXLD5")
+            .expect(403)
+            .then((response) => {
+                expect(response.body.msg).toBe("No Authentication Token");
             });
     });
 });

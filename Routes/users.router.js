@@ -7,6 +7,6 @@ const usersRouter = require("express").Router({ mergeParams: true });
 
 usersRouter.route("/").get(getUsers).post(postUser);
 
-usersRouter.route("/:username").get(getUser);
+usersRouter.route("/:uuid").get(getUser);
 
 module.exports = usersRouter;

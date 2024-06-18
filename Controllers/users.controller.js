@@ -19,8 +19,18 @@ exports.getUsers = (request, response, next) => {
 };
 
 exports.getUser = (request, response, next) => {
-    const { username } = request.params;
-    selectUser(username)
+    const { uuid } = request.params;
+
+    authenticate(request)
+        .then(({ uid: firebaseUid }) => {
+            if (firebaseUid !== uuid) {
+                return Promise.reject({
+                    status: 403,
+                    msg: "Authentication Failed",
+                });
+            }
+            return selectUser(uuid);
+        })
         .then((user) => {
             response.status(200).send({ user });
         })
